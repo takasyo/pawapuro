@@ -1,6 +1,7 @@
 import csv
 
 def load_ability():
+    # 特殊能力
 
     with open("./data/special_ability.csv") as f:
         reader = csv.reader(f)
@@ -21,7 +22,9 @@ def load_ability():
     return data
 
 def load_basis():
+    # 基礎能力
     pass
 
 def load_extend():
+    # 拡張能力
     pass

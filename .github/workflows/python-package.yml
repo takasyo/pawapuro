@@ -31,4 +31,4 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pulp
     - name: Run
-      run: python script/main.py
+      run: python script/calcmax.py
