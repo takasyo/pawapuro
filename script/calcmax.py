@@ -2,26 +2,27 @@ import pulp
 
 from load_data import load_ability, load_basis, load_extend
 
-ability=load_ability()
+ability = load_ability()
+basis = load_basis()
 
 # 問題の定義
 prob = pulp.LpProblem(name="パワプロ", sense=pulp.LpMaximize)
 
 # 変数の定義
-xs = [pulp.LpVariable('{}'.format(x), cat='Integer', lowBound=0, upBound=1) for x in ability["得能"]]
-# ys = [basis]基礎能力
+xs = [pulp.LpVariable('{}'.format(x), cat=pulp.LpBinary) for x in ability["得能"]]
+ys = [[pulp.LpVariable('{}{}'.format(name, x), cat=pulp.LpBinary) for x in basis[name][name]] for name in basis.keys()]
 # zs = [extend]拡張能力
 
 # 目的関数
-prob += pulp.lpDot(ability["査定"], xs)
-# prob += pulp.lpDot(ability["査定"]+basis["査定"], xs+ys)
+xx = pulp.lpDot(ability["査定"], xs)
+yy = 7.84*(pulp.lpDot([basis[name]["÷7.84"] for name in basis.keys()], ys)*7/6 + 0.5)
+prob += pulp.lpSum(xx + yy)
 
 # 制約条件の定義
-prob += pulp.lpDot(ability["筋力"], xs) <= 500
-prob += pulp.lpDot(ability["敏捷"], xs) <= 500
-prob += pulp.lpDot(ability["技術"], xs) <= 500
-prob += pulp.lpDot(ability["変化"], xs) <= 0
-prob += pulp.lpDot(ability["精神"], xs) <= 500
+for j in ["筋力", "敏捷", "技術", "変化", "精神"]:
+    x0 = pulp.lpDot(ability[j], xs)
+    y0 = pulp.lpSum([pulp.lpDot(basis[name][j], ys[i]) for i, name in enumerate(basis.keys())])
+    prob += pulp.lpSum(x0+y0) <= 1000
 
 # 下位得能の対応
 flag = 0
@@ -33,6 +34,9 @@ for i in range(len(ability["得能"])):
         up = i
         flag = 0
         prob += pulp.lpSum([xs[j] for j in range(low, up)]) <= 1
+
+for i in range(len(ys)):
+    prob += pulp.lpSum(ys[i]) <= 1
 
 # 互換得能の対応
 for i in range(len(ability["得能"])):
@@ -52,7 +56,11 @@ print("----結果----")
 for x in xs:
     if x.value() != 0:
         print(f"{x}:{x.value()}")
+for tmp in ys:
+    for y in tmp:
+        if y.value() != 0:
+            print(f"{y}:{y.value()}")
 
-print(f"\n査定：{pulp.lpDot(ability['査定'], xs).value()}")
-for key in ["筋力", "敏捷", "技術", "変化", "精神"]:
-    print(f"{key}：500 に対し {pulp.lpDot(ability[key], xs).value()}")
+# print(f"\n査定：{pulp.lpDot(ability['査定'], xs).value()}")
+# for key in ["筋力", "敏捷", "技術", "変化", "精神"]:
+#     print(f"{key}：500 に対し {pulp.lpDot(ability[key], xs).value()}")
