@@ -2,7 +2,7 @@ import csv
 
 def load_ability():
     # 特殊能力
-    with open("./data/special_ability.csv") as f:
+    with open("./data/ability.csv") as f:
         reader = csv.reader(f)
         l = [row for row in reader]
         l = [list(x) for x in zip(*l)]
@@ -24,7 +24,7 @@ def load_basis():
     # 基礎能力
     basis = {}
     for num in range(7):
-        with open(f"./data/{num}.csv") as f:
+        with open(f"./data/b{num}.csv") as f:
             reader = csv.reader(f)
             l = [row for row in reader]
             l = [list(x) for x in zip(*l)]
