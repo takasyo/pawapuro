@@ -1,6 +1,6 @@
 import csv
 
-def load_ability():
+def load_ability(sense):
     # 特殊能力
     with open("./data/ability.csv") as f:
         reader = csv.reader(f)
@@ -12,6 +12,10 @@ def load_ability():
     for i in ["筋力", "敏捷", "技術", "変化", "精神", "査定"]:
         data[i] = list(map(float, data[i]))
 
+    if sense:
+        for i in ["筋力", "敏捷", "技術", "変化", "精神"]:
+            data[i] = list(map(lambda x: int(x*0.9), data[i]))
+
     # 下位を合わせた計算
     for i in range(len(l[0]) - 1):
         if data["下位"][i] != "":
@@ -20,7 +24,7 @@ def load_ability():
 
     return data
 
-def load_basis(set="basis"):
+def load_basis(sense, set="basis"):
     # 基礎能力
     maxlen = 7
     prefix = "b"
@@ -39,6 +43,10 @@ def load_basis(set="basis"):
 
         for i in ["筋力", "敏捷", "技術", "変化", "精神", "査定", "÷7.84"]:
             data[i] = list(map(float, data[i]))
+
+        if sense:
+            for i in ["筋力", "敏捷", "技術", "変化", "精神"]:
+                data[i] = list(map(lambda x: int(x*0.9), data[i]))
 
         # 下位を合わせた計算
         for i in range(len(l[0]) - 1):

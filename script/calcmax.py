@@ -2,9 +2,12 @@ import pulp
 
 from load_data import load_ability, load_basis
 
-ability = load_ability()
-basis = load_basis()
-extend = load_basis("extend")
+sense = 1
+point = {"筋力":999, "敏捷":999, "技術":999, "変化":0, "精神":999}
+
+ability = load_ability(sense)
+basis = load_basis(sense)
+extend = load_basis(sense, "extend")
 
 # 問題の定義
 prob = pulp.LpProblem(name="パワプロ", sense=pulp.LpMaximize)
@@ -25,7 +28,7 @@ for j in ["筋力", "敏捷", "技術", "変化", "精神"]:
     x0 = pulp.lpDot(ability[j], xs)
     y0 = pulp.lpSum([pulp.lpDot(basis[name][j], ys[i]) for i, name in enumerate(basis.keys())])
     z0 = pulp.lpSum([pulp.lpDot(extend[name][j], zs[i]) for i, name in enumerate(extend.keys())])
-    prob += pulp.lpSum(x0 + y0 + z0) <= 5000
+    prob += pulp.lpSum(x0 + y0 + z0) <= point[j]
 
 # 下位得能の対応
 flag = 0
@@ -77,4 +80,4 @@ for j in ["筋力", "敏捷", "技術", "変化", "精神"]:
     x0 = pulp.lpDot(ability[j], xs)
     y0 = pulp.lpSum([pulp.lpDot(basis[name][j], ys[i]) for i, name in enumerate(basis.keys())])
     z0 = pulp.lpSum([pulp.lpDot(extend[name][j], zs[i]) for i, name in enumerate(extend.keys())])
-    print(f"{j}：5000に対し {pulp.lpSum(x0 + y0 + z0).value()}")
+    print(f"{j}：{point[j]}に対し {pulp.lpSum(x0 + y0 + z0).value()}")
